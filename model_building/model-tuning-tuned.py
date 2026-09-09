@@ -15,7 +15,10 @@ import mlflow.sklearn
 
 # Assuming X_train, X_test, y_train, y_test are available from previous data preparation step
 # If this script is run standalone, you would need to load them here.
-# Example: X_train = pd.read_csv('X_train.csv') etc.
+X_train = pd.read_csv('X_train.csv')
+X_test = pd.read_csv('X_test.csv')
+y_train = pd.read_csv('y_train.csv')
+y_test = pd.read_csv('X_test.csv')
 
 # Set up MLflow for tracking this specific tuning run
 # Using sqlite for local tracking within the script context
