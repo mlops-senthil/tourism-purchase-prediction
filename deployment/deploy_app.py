@@ -5,7 +5,7 @@ from huggingface_hub import HfApi
 # These variables will be used by GitHub Actions
 HF_TOKEN = os.getenv("HF_TOKEN")
 SPACE_REPO_ID = "senthil31/tourism-product-prediction-app-space"
-DEPLOYMENT_FOLDER = "tourism_project/deployment"
+DEPLOYMENT_FOLDER = "deployment"
 
 if not HF_TOKEN:
     print("Error: HF_TOKEN environment variable is not set. Please add it to your GitHub Secrets.")
