@@ -13,12 +13,12 @@ jobs:
       - uses: actions/checkout@v3
       - name: Install Dependencies
         run: |
-          pip install -r tourism_project/deployment/requirements.txt
+          pip install -r deployment/requirements.txt
       - name: Upload Dataset to Hugging Face Hub
         env:
           HF_TOKEN: ${{ secrets.HF_TOKEN }}
         run: |
-          python tourism_project/model_building/data_register.py
+          python model_building/data_register.py
 
   data-prep:
     needs: register-dataset
