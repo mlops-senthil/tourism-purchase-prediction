@@ -27,12 +27,12 @@ jobs:
       - uses: actions/checkout@v3
       - name: Install Dependencies
         run: |
-          pip install -r tourism_project/deployment/requirements.txt
+          pip install -r deployment/requirements.txt
       - name: Run Data Preparation
         env:
           HF_TOKEN: ${{ secrets.HF_TOKEN }}
         run: |
-          python tourism_project/model_building/prep.py
+          python model_building/prep.py
 
   model-tuning:
     needs: data-prep
@@ -41,7 +41,7 @@ jobs:
       - uses: actions/checkout@v3
       - name: Install Dependencies
         run: |
-          pip install -r tourism_project/deployment/requirements.txt
+          pip install -r deployment/requirements.txt
           pip install mlflow # MLflow is specifically needed for this step
       - name: Start MLflow Server
         run: |
@@ -51,7 +51,7 @@ jobs:
         env:
           HF_TOKEN: ${{ secrets.HF_TOKEN }}
         run: |
-          python tourism_project/model_building/model-tuning-tuned.py
+          python model_building/model-tuning-tuned.py
 
   deploy-hosting:
     runs-on: ubuntu-latest
@@ -60,9 +60,9 @@ jobs:
       - uses: actions/checkout@v3
       - name: Install Dependencies
         run: |
-          pip install -r tourism_project/deployment/requirements.txt
+          pip install -r deployment/requirements.txt
       - name: Push files to Frontend Hugging Face Space
         env:
           HF_TOKEN: ${{ secrets.HF_TOKEN }}
         run: |
-          python tourism_project/deployment/deploy_app.py
+          python deployment/deploy_app.py
