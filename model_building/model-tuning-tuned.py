@@ -1,4 +1,3 @@
-%%writefile tourism_project/model_building/model-tuning-tuned.py
 
 import os
 import joblib
