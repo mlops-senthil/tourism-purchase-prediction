@@ -1,3 +1,5 @@
+import os
+import joblib
 import numpy as np
 import pandas as pd
 from sklearn.linear_model import LogisticRegression
@@ -5,17 +7,30 @@ from sklearn.preprocessing import StandardScaler
 from sklearn.metrics import accuracy_score, precision_score, recall_score, f1_score, roc_auc_score
 from sklearn.pipeline import Pipeline
 from sklearn.model_selection import GridSearchCV
-import joblib
-import os
-from huggingface_hub import HfApi, create_repo
+from huggingface_hub import HfApi, create_repo, hf_hub_download
 import mlflow
 import mlflow.sklearn
 
-# Fix: Load correct files and convert targets to 1D arrays using ravel()
-X_train = pd.read_csv('X_train.csv')
-X_test = pd.read_csv('X_test.csv')
-y_train = pd.read_csv('y_train.csv').values.ravel()
-y_test = pd.read_csv('y_test.csv').values.ravel()
+# Hugging Face Dataset Configuration
+DATASET_REPO = "senthil31/tourism-dataset"
+
+def load_processed_file(filename):
+    try:
+        # Download processed files stored under 'processed/' path in Hugging Face
+        file_path = hf_hub_download(repo_id=DATASET_REPO, filename=f"processed/{filename}", repo_type="dataset")
+        return pd.read_csv(file_path)
+    except Exception as e:
+        print(f"Failed to fetch processed/{filename} from Hugging Face: {e}")
+        print(f"Attempting fallback to local file '{filename}'...")
+        return pd.read_csv(filename)
+
+# Load data directly from Hugging Face Hub
+X_train = load_processed_file("X_train.csv")
+X_test = load_processed_file("X_test.csv")
+y_train = load_processed_file("y_train.csv").values.ravel()
+y_test = load_processed_file("y_test.csv").values.ravel()
+
+print("Data loaded successfully.")
 
 # Set up MLflow
 mlflow.set_tracking_uri("sqlite:///mlruns.db")
@@ -47,7 +62,7 @@ with mlflow.start_run(run_name="Logistic_Regression_Tuned_Best_Model"):
     y_pred_tuned = best_pipeline.predict(X_test)
     y_pred_proba_tuned = best_pipeline.predict_proba(X_test)[:, 1]
 
-    # Metrics now work with 1D arrays
+    # Metrics computation
     accuracy_tuned = accuracy_score(y_test, y_pred_tuned)
     precision_tuned = precision_score(y_test, y_pred_tuned, zero_division=0)
     recall_tuned = recall_score(y_test, y_pred_tuned, zero_division=0)
@@ -66,9 +81,8 @@ with mlflow.start_run(run_name="Logistic_Regression_Tuned_Best_Model"):
     os.makedirs(tuned_model_path, exist_ok=True)
     joblib.dump(best_pipeline, os.path.join(tuned_model_path, "model.pkl"))
     joblib.dump(X_train.columns.tolist(), os.path.join(tuned_model_path, "model_features.pkl"))
-    
-    HF_TOKEN = os.getenv("HF_TOKEN")
-    api = HfApi(token=HF_TOKEN)
+
+    api = HfApi(token=os.getenv("HF_TOKEN"))
     repo_id_tuned = "senthil31/tourism-product-prediction-tuned-model"
 
     try:
