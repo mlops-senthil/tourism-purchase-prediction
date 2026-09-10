@@ -16,11 +16,11 @@ DATASET_REPO = "senthil31/tourism-dataset"
 
 def load_processed_file(filename):
     try:
-        # Download processed files stored under 'processed/' path in Hugging Face
-        file_path = hf_hub_download(repo_id=DATASET_REPO, filename=f"processed/{filename}", repo_type="dataset")
+        # Download files directly from the root directory in Hugging Face
+        file_path = hf_hub_download(repo_id=DATASET_REPO, filename=filename, repo_type="dataset")
         return pd.read_csv(file_path)
     except Exception as e:
-        print(f"Failed to fetch processed/{filename} from Hugging Face: {e}")
+        print(f"Failed to fetch {filename} from Hugging Face: {e}")
         print(f"Attempting fallback to local file '{filename}'...")
         return pd.read_csv(filename)
 
