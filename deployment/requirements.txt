@@ -6,3 +6,4 @@ scikit-learn
 joblib
 huggingface_hub
 mlflow
+protobuf<=3.20.3
