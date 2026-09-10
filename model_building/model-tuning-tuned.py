@@ -1,3 +1,5 @@
+%%writefile tourism_project/model_building/model-tuning-tuned.py
+
 import os
 import joblib
 import numpy as np
@@ -14,17 +16,20 @@ import mlflow.sklearn
 # Hugging Face Dataset Configuration
 DATASET_REPO = "senthil31/tourism-dataset"
 
+HF_TOKEN = os.getenv("HF_TOKEN")
+api = HfApi(token=HF_TOKEN)
+
 def load_processed_file(filename):
     try:
         # Download files directly from the root directory in Hugging Face
-        file_path = hf_hub_download(repo_id=DATASET_REPO, filename=filename, repo_type="dataset")
+        file_path = hf_hub_download(repo_id=DATASET_REPO, filename=filename, repo_type="dataset", token=HF_TOKEN)
         return pd.read_csv(file_path)
     except Exception as e:
         print(f"Failed to fetch {filename} from Hugging Face: {e}")
         print(f"Attempting fallback to local file '{filename}'...")
         return pd.read_csv(filename)
 
-# Load data directly from Hugging Face Hub
+# Load data directly from Hugging Face Hub root
 X_train = load_processed_file("X_train.csv")
 X_test = load_processed_file("X_test.csv")
 y_train = load_processed_file("y_train.csv").values.ravel()
@@ -82,7 +87,6 @@ with mlflow.start_run(run_name="Logistic_Regression_Tuned_Best_Model"):
     joblib.dump(best_pipeline, os.path.join(tuned_model_path, "model.pkl"))
     joblib.dump(X_train.columns.tolist(), os.path.join(tuned_model_path, "model_features.pkl"))
 
-    api = HfApi(token=os.getenv("HF_TOKEN"))
     repo_id_tuned = "senthil31/tourism-product-prediction-tuned-model"
 
     try:
