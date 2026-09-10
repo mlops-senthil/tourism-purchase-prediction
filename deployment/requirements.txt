@@ -1,5 +1,3 @@
-
-streamlit==1.9.0
 pandas
 numpy
 scikit-learn
@@ -8,3 +6,4 @@ huggingface_hub
 mlflow
 protobuf<=3.20.3
 altair<5.0.0
+streamlit>=1.18.0
