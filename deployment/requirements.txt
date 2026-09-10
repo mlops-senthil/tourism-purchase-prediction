@@ -1,9 +1,9 @@
 pandas
 numpy
-scikit-learn
 joblib
 huggingface_hub
 mlflow
 protobuf<=3.20.3
 altair<5.0.0
 streamlit>=1.18.0
+scikit-learn==1.6.1
