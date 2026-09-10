@@ -19,23 +19,26 @@ DATASET_REPO = "senthil31/tourism-dataset"
 HF_TOKEN = os.getenv("HF_TOKEN")
 api = HfApi(token=HF_TOKEN)
 
-def load_processed_file(filename):
-    try:
-        # Download files directly from the root directory in Hugging Face
-        file_path = hf_hub_download(repo_id=DATASET_REPO, filename=filename, repo_type="dataset", token=HF_TOKEN)
-        return pd.read_csv(file_path)
-    except Exception as e:
-        print(f"Failed to fetch {filename} from Hugging Face: {e}")
-        print(f"Attempting fallback to local file '{filename}'...")
-        return pd.read_csv(filename)
+repo_id = "senthil31/tourism-dataset"
+files = ["X_train.csv", "X_test.csv", "y_train.csv", "y_test.csv"]
 
-# Load data directly from Hugging Face Hub root
-X_train = load_processed_file("X_train.csv")
-X_test = load_processed_file("X_test.csv")
-y_train = load_processed_file("y_train.csv").values.ravel()
-y_test = load_processed_file("y_test.csv").values.ravel()
+# Dictionary to store local paths of downloaded files
+downloaded_paths = {}
 
-print("Data loaded successfully.")
+for file in files:
+    local_path = hf_hub_download(
+        repo_id=repo_id,
+        filename=file,
+        repo_type="dataset",
+        token=HF_TOKEN,  # Optional if the repository is public
+    )
+    downloaded_paths[file] = local_path
+    print(f"Downloaded {file} to: {local_path}")
+
+X_train = pd.read_csv(downloaded_paths["X_train.csv"])
+X_test = pd.read_csv(downloaded_paths["X_test.csv"])
+y_train = pd.read_csv(downloaded_paths["y_train.csv"]).values.ravel()
+y_test = pd.read_csv(downloaded_paths["y_test.csv"]).values.ravel()
 
 # Set up MLflow
 mlflow.set_tracking_uri("sqlite:///mlruns.db")
